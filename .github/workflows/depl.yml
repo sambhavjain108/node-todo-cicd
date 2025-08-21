@@ -66,7 +66,7 @@ jobs:
 
       - name: Scan Docker Image and Save CSV Report
         run: |
-          wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/report/csv.tpl -O csv.tpl
+          wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/template/csv.tpl -O csv.tpl
           trivy image --format template --template "@csv.tpl" -o trivy-report.csv --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USER }}/node-app:latest
 
       - name: Upload Trivy Report as Artifact
