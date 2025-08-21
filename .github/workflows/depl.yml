@@ -52,7 +52,7 @@ jobs:
 
   deploy:
     name: Deploy App
-    runs-on: aws-ec2
+    runs-on: [self-hosted, Linux, X64]
     needs: push_to_dockerhub
     steps:
       - name: Checkout code
