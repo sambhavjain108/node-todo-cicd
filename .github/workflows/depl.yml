@@ -66,7 +66,7 @@ jobs:
 
       - name: Scan Docker Image and Save JSON Report
         run: |
-          trivy image --format json --output trivy-report.json --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USER }}/node-app:latest
+          trivy image --format table --output trivy-report.json --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USER }}/node-app:latest
 
       - name: Upload Trivy Report as Artifact
         uses: actions/upload-artifact@v4
