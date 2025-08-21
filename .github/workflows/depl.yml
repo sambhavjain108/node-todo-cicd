@@ -64,9 +64,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install trivy -y
 
-      - name: Scan Docker Image and Save Report
+      - name: Scan Docker Image and Save CSV Report
         run: |
-          trivy image --format csv --output trivy-report.csv --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USER }}/node-app:latest
+         wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/template/csv.tpl -O csv.tpl
+         trivy image --format template --template "@csv.tpl" -o trivy-report.csv --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USER }}/node-app:latest
+
 
       - name: Upload Trivy Report as Artifact
         uses: actions/upload-artifact@v4
