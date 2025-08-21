@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Log in to Docker Hub
-        run: docker login -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_pass}}
+        run: docker login -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_pass }}
 
       - name: Build Docker Image
         run: docker build -t node-app .
@@ -57,19 +57,26 @@ jobs:
     steps:
       - name: Install Trivy
         run: |
-          sudo apt-get install wget apt-transport-https gnupg lsb-release
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
-          sudo apt-get install trivy
+          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy -y
 
+      - name: Scan Docker Image and Save Report
+        run: |
+          trivy image --format csv --output trivy-report.csv --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USER }}/node-app:latest
 
-      - name: Scan Docker Image
-        run: trivy image --exit-code 0 --severity HIGH,CRITICAL ${{ secrets.DOCKERHUB_USER }}/node-app:latest
+      - name: Upload Trivy Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-scan-report
+          path: trivy-report.csv
 
   deploy:
     name: Deploy App
-    runs-on: [self-hosted, Linux, X64]  # Make sure your EC2 runner is registered with these labels
+    runs-on: [self-hosted, Linux, X64]
     needs: scan_with_trivy
     steps:
       - name: Checkout code
