@@ -41,6 +41,9 @@ jobs:
 
       - name: Log in to Docker Hub
         run: docker login -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_pass}}
+      
+      - name: Build Docker Image
+        run: docker build -t node-app .
 
       - name: Tag and Push Docker Image
         run: |
